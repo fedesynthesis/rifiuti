@@ -256,7 +256,7 @@ function pickup(d){                      // → [{t, zone?}]
 const forZone=(list,z)=>list.filter(x=>!x.zone||!z||x.zone===z);
 
 /* ===== Stato ===== */
-let zone=localStorage.getItem('rifiuti_zone')||'';
+let zone=localStorage.getItem('rifiuti_zone')||'NORD';
 const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
 const fmt=(d,o)=>d.toLocaleDateString('it-IT',o);
