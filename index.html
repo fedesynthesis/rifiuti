@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Rifiuti Mazzano</title>
+<meta name="theme-color" content="#f4f1ea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rifiuti">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --card:#fffdf8; --ink:#1f2a24; --muted:#6b7570; --line:#e6e1d6;
+  --accent:#2f7d5b; --accent-ink:#fff; --danger:#c8385a;
+  --organico:#c93d2e; --secco:#5d6670; --plastica:#e8b90c; --carta:#9a7a4f;
+  --vetro:#2f8a5b; --tessili:#3d9ad6; --verde:#5f9b2e;
+  --r:18px; --sh:0 1px 2px rgba(20,30,25,.05),0 8px 24px -12px rgba(20,30,25,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.35}
+body{padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 84px);max-width:560px;margin:0 auto;-webkit-user-select:none;user-select:none}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;margin:0;letter-spacing:-.01em}
+h1{font-size:30px}
+h2{font-size:20px;margin:26px 0 10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.top small{display:block;color:var(--muted);font-size:13px;font-weight:500;font-family:Inter}
+.zone{display:flex;background:#e9e4d8;border-radius:999px;padding:3px;gap:2px}
+.zone button{border:0;background:transparent;font:600 13px Inter;padding:8px 13px;border-radius:999px;color:var(--muted);cursor:pointer}
+.zone button.on{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.hero{background:linear-gradient(160deg,#245f47,#2f7d5b);color:#fff;border:0}
+.hero .lbl{font:600 12px/1 Inter;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+.hero h2{margin:8px 0 4px;font-size:26px;color:#fff}
+.hero p{margin:0 0 14px;opacity:.85;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:9px 13px 9px 9px;border-radius:14px;font-weight:600;font-size:15px;background:#fff;color:var(--ink);border:1px solid var(--line)}
+.chip i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:17px;flex:none;color:#fff}
+.chip.sm{padding:5px 9px 5px 5px;font-size:13px;border-radius:10px}
+.chip.sm i{width:24px;height:24px;font-size:14px;border-radius:7px}
+.hero .chip{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.18)}
+.none{color:var(--muted);font-weight:500}
+.hero .none{color:rgba(255,255,255,.75)}
+.today{margin-top:10px;display:flex;align-items:center;gap:12px;padding:12px 14px}
+.today .k{font:600 12px Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none;width:48px}
+.days{display:flex;flex-direction:column;gap:8px}
+.day{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;padding:11px 14px}
+.day .d{text-align:center}
+.day .d b{display:block;font-family:Fraunces,serif;font-size:22px;line-height:1;font-weight:700}
+.day .d span{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:3px}
+.day.sun{opacity:.55}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nx{display:flex;align-items:center;gap:10px;padding:11px 12px}
+.nx i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-style:normal;font-size:18px;color:#fff;flex:none}
+.nx b{display:block;font-size:14px}
+.nx span{font-size:13px;color:var(--muted)}
+/* calendario */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px}
+.calhead h2{margin:0;text-transform:capitalize}
+.calhead button{border:0;background:var(--card);border:1px solid var(--line);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;color:var(--ink)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);font:600 11px Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:6px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cell{aspect-ratio:1/1.15;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:5px 4px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative}
+.cell.empty{background:transparent;border-color:transparent;cursor:default}
+.cell.sun{background:#f6ecec}
+.cell.now{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.cell.sel{background:#e8f3ec}
+.cell .n{font-size:13px;font-weight:600}
+.cell.sun .n{color:var(--danger)}
+.cell .dots{display:flex;flex-wrap:wrap;gap:3px}
+.cell .dots i{width:8px;height:8px;border-radius:50%}
+.cell .z{position:absolute;top:4px;right:4px;font:700 8px Inter;color:var(--secco);letter-spacing:.04em}
+.detail{margin-top:12px}
+.detail .t{font-weight:700;margin-bottom:8px;text-transform:capitalize}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:50%}
+/* info */
+.info h3{font-size:17px;margin:0 0 8px}
+.info p{margin:0 0 8px;font-size:15px}
+.info .card+.card{margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:6px 4px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.muted{color:var(--muted)}
+a{color:var(--accent);font-weight:600;text-decoration:none}
+.tel{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;background:#eaf3ee;margin:4px 6px 4px 0;font-size:14px}
+ul{padding-left:18px;margin:0}li{margin:4px 0;font-size:15px}
+.btn{display:inline-block;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px Inter;padding:12px 16px;border-radius:14px;cursor:pointer;width:100%;margin-top:8px}
+/* tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:8px 16px calc(env(safe-area-inset-bottom) + 8px);background:rgba(244,241,234,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:5}
+.tabs button{flex:1;max-width:170px;border:0;background:transparent;font:600 13px Inter;color:var(--muted);padding:9px 6px;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs button span{font-size:20px;line-height:1}
+.tabs button.on{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+.view{display:none}.view.on{display:block}
+.pick{background:#fff6dc;border:1px solid #f0dfa3;border-radius:14px;padding:12px 14px;font-size:14px;margin-bottom:12px}
+.pick b{display:block;margin-bottom:2px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div><h1>Rifiuti</h1><small>Mazzano · ecocalendario CBBO 2026</small></div>
+  <div class="zone" id="zone">
+    <button data-z="NORD">Nord</button><button data-z="SUD">Sud</button>
+  </div>
+</div>
+
+<!-- OGGI -->
+<section class="view on" id="v-oggi">
+  <div class="pick" id="pick" hidden><b>Scegli la tua zona</b>Il secco viene ritirato a mercoledì alterni: Nord o Sud. Se non la conosci, chiedi a C.B.B.O. (800 595020).</div>
+  <div class="card hero">
+    <div class="lbl">Stasera esponi</div>
+    <h2 id="tmr-title">—</h2>
+    <p id="tmr-sub">Fuori dalle 22:00, entro le 5:00 del giorno del ritiro.</p>
+    <div class="chips" id="tmr-chips"></div>
+  </div>
+  <div class="card today"><div class="k">Oggi</div><div class="chips" id="today-chips"></div></div>
+
+  <h2>Prossimi giorni</h2>
+  <div class="days" id="days"></div>
+
+  <h2>Prossimo ritiro</h2>
+  <div class="grid" id="next"></div>
+</section>
+
+<!-- CALENDARIO -->
+<section class="view" id="v-cal">
+  <div class="calhead">
+    <button id="prev" aria-label="Mese precedente">‹</button>
+    <h2 id="cal-title"></h2>
+    <button id="nxt" aria-label="Mese successivo">›</button>
+  </div>
+  <div class="dow"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>
+  <div class="cal" id="cal"></div>
+  <div class="card detail" id="detail"></div>
+  <div class="legend" id="legend"></div>
+  <p class="note">Le date del 2027 seguono lo stesso schema del 2026: verificale sul nuovo ecocalendario quando esce.</p>
+</section>
+
+<!-- INFO -->
+<section class="view info" id="v-info">
+  <div class="card">
+    <h3>Centro di Raccolta</h3>
+    <p>Via Matteotti 126, Mazzano. Accesso con tessera sanitaria (ECOPASS per le aziende).</p>
+    <table>
+      <tr><th></th><th>Estivo <span class="muted">1/4–31/10</span></th><th>Invernale <span class="muted">1/11–31/3</span></th></tr>
+      <tr><td>Lun</td><td>15–18</td><td>14–17</td></tr>
+      <tr><td>Mar</td><td>9–12</td><td>9–12</td></tr>
+      <tr><td>Mer</td><td>15–18</td><td>14–17</td></tr>
+      <tr><td>Gio</td><td>9–12</td><td>9–12</td></tr>
+      <tr><td>Ven</td><td>15–18</td><td>14–17</td></tr>
+      <tr><td>Sab</td><td>9–12 · 15–18</td><td>9–12 · 14–17</td></tr>
+      <tr><td>Dom</td><td colspan="2" class="muted">chiuso</td></tr>
+    </table>
+    <p class="note" id="cdr-now"></p>
+    <p class="note"><b>Chiuso nel 2026:</b> 1 gen, 6 gen, 5–6 apr, 25 apr, 1 mag, 2 giu, 15 ago, 4 ott, 1 nov, 8 dic, 25–26 dic.</p>
+  </div>
+
+  <div class="card">
+    <h3>Regole veloci</h3>
+    <ul>
+      <li>Bidoni e sacchi fuori <b>dalle 22:00</b> della sera prima, <b>entro le 5:00</b>; ritirali entro la giornata.</li>
+      <li>Peso massimo di sacchi e bidoncini: <b>16 kg</b>.</li>
+      <li><b>Secco</b>: esponi il bidoncino solo se pieno e con coperchio chiuso. Niente sacchi fuori dal bidone.</li>
+      <li><b>Carta</b>: solo in scatole o sacchi di carta a perdere.</li>
+      <li><b>Verde</b>: ogni martedì dal 3 feb al 24 nov; fino a 5 fascine legate (max 1 m) accanto al bidone.</li>
+      <li><b>Umido extra del sabato</b>: dal 6 giu al 29 ago.</li>
+      <li>Borse della spesa biodegradabili → nell'<b>umido</b>, non nella plastica. Piatti in ceramica → Centro di Raccolta.</li>
+      <li>Aghi con cappuccio di sicurezza → nel secco.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Svuotamenti secco inclusi nella TARI</h3>
+    <table>
+      <tr><th>Componenti</th><th>Bidone 50 l</th><th>Bidone 120 l</th></tr>
+      <tr><td>1</td><td>12</td><td>5</td></tr>
+      <tr><td>2</td><td>14</td><td>6</td></tr>
+      <tr><td>3</td><td>22</td><td>9</td></tr>
+      <tr><td>4</td><td>—</td><td>11</td></tr>
+      <tr><td>5</td><td>—</td><td>12</td></tr>
+      <tr><td>&gt;5</td><td>—</td><td>13</td></tr>
+    </table>
+    <p class="note">Oltre la soglia: 50 l € 2,50, 120 l € 6,00 a svuotamento. Sacchetti gratuiti: 200 umido, 70 plastica l'anno.</p>
+  </div>
+
+  <div class="card">
+    <h3>Ingombranti a domicilio</h3>
+    <p>Su prenotazione, a sabati alterni. Max 5 colli, 2 m³ totali, a bordo strada. Frigoriferi, lavatrici, mobili, materassi, serramenti…</p>
+    <a class="tel" href="tel:0307282050">📞 030 7282050</a><a class="tel" href="tel:800595020">📞 800 595020</a>
+  </div>
+
+  <div class="card">
+    <h3>Contatti</h3>
+    <p><b>C.B.B.O.</b> · <a href="mailto:segnalazioni@cbbo.it">segnalazioni@cbbo.it</a> · <a href="https://www.cbbo.it/mazzano" target="_blank" rel="noopener">cbbo.it/mazzano</a></p>
+    <p><b>Sportello tariffa</b> (in Comune, Viale della Resistenza 20): lun e mer 16–18, ven 10–12:45 · <a class="tel" href="tel:800816884">📞 800 816 884</a></p>
+    <p><a href="https://www.cbbo.it/sites/default/files/2025-12/Ecocalendario_2026_MAZZANO_WEB.pdf" target="_blank" rel="noopener">📄 Ecocalendario 2026 (PDF)</a><br>
+       <a href="https://www.cbbo.it/sites/default/files/2026-03/guida%20raccolta%20differenziata_MAZZANO_REV_MARZO%202026.pdf" target="_blank" rel="noopener">📄 Guida alla differenziata (PDF)</a></p>
+  </div>
+
+  <div class="card">
+    <h3>Promemoria sul telefono</h3>
+    <p>Scarica un file per il Calendario iPhone: un evento per ogni ritiro della tua zona, con avviso la sera prima alle 20:00.</p>
+    <button class="btn" id="ics">Esporta il 2026 in Calendario (.ics)</button>
+  </div>
+</section>
+
+<nav class="tabs">
+  <button class="on" data-v="oggi"><span>🗓️</span>Oggi</button>
+  <button data-v="cal"><span>📆</span>Calendario</button>
+  <button data-v="info"><span>ℹ️</span>Info</button>
+</nav>
+
+<script>
+/* ===== Tipi di rifiuto ===== */
+const T={
+  organico:{n:'Umido',   e:'🍎',c:'var(--organico)',col:'#c93d2e'},
+  plastica:{n:'Plastica',e:'🧴',c:'var(--plastica)',col:'#e8b90c'},
+  secco:   {n:'Secco',   e:'🗑️',c:'var(--secco)',   col:'#5d6670'},
+  tessili: {n:'Pannolini',e:'🧷',c:'var(--tessili)', col:'#3d9ad6'},
+  vetro:   {n:'Vetro e lattine',e:'🍾',c:'var(--vetro)',col:'#2f8a5b'},
+  carta:   {n:'Carta',   e:'📦',c:'var(--carta)',    col:'#9a7a4f'},
+  verde:   {n:'Verde',   e:'🌿',c:'var(--verde)',    col:'#5f9b2e'},
+};
+
+/* ===== Regole (ecocalendario CBBO Mazzano 2026) ===== */
+const REF_NORD=new Date(2026,0,7);          // mer 7 gen 2026 = secco NORD, poi alterni
+const VERDE=[[new Date(2026,1,3),new Date(2026,10,24)]];          // ogni martedì
+const UMIDO_SAB=[[new Date(2026,5,6),new Date(2026,7,29)]];       // umido extra del sabato
+const EXC={ // variazioni festive: data → cosa viene ritirato
+  '2026-01-01':[], '2026-01-02':['organico'], '2026-01-03':['carta','tessili'],
+  '2026-12-25':[], '2026-12-26':['carta','tessili'],
+  '2027-01-01':[], '2027-01-02':['carta','tessili'],
+};
+const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const sameDay=(a,b)=>key(a)===key(b);
+const inRange=(d,rs)=>rs.some(([a,b])=>d>=a&&d<=b) || (d.getFullYear()>2026 && rs===VERDE && d.getMonth()>=1 && d.getMonth()<=10 && !(d.getMonth()===1&&d.getDate()<3) && !(d.getMonth()===10&&d.getDate()>24));
+function seccoZone(d){ const w=Math.round((d-REF_NORD)/6048e5); return w%2===0?'NORD':'SUD'; }
+function pickup(d){                      // → [{t, zone?}]
+  const k=key(d); if(EXC[k]) return EXC[k].map(t=>({t}));
+  const w=d.getDay(); const out=[];
+  if(w===1||w===4) out.push({t:'organico'});
+  if(w===2){ out.push({t:'plastica'}); if(inRange(d,VERDE)) out.push({t:'verde'}); }
+  if(w===3){ out.push({t:'secco',zone:seccoZone(d)},{t:'tessili'},{t:'vetro'}); }
+  if(w===5) out.push({t:'carta'});
+  if(w===6){ out.push({t:'tessili'}); if(inRange(d,UMIDO_SAB)) out.push({t:'organico'}); }
+  return out;
+}
+const forZone=(list,z)=>list.filter(x=>!x.zone||!z||x.zone===z);
+
+/* ===== Stato ===== */
+let zone=localStorage.getItem('rifiuti_zone')||'';
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const fmt=(d,o)=>d.toLocaleDateString('it-IT',o);
+const dayName=d=>{const t=today();if(sameDay(d,t))return'Oggi';if(sameDay(d,addDays(t,1)))return'Domani';return fmt(d,{weekday:'long'});};
+const chip=(x,sm)=>{const t=T[x.t];return `<span class="chip${sm?' sm':''}"><i style="background:${t.c}">${t.e}</i>${t.n}${x.zone?' <small class="muted">'+x.zone+'</small>':''}</span>`;};
+const chips=(list,sm)=>list.length?list.map(x=>chip(x,sm)).join(''):'<span class="none">Nessun ritiro</span>';
+
+/* ===== Vista OGGI ===== */
+function renderOggi(){
+  const t=today(), tm=addDays(t,1);
+  document.getElementById('pick').hidden=!!zone;
+  const L=forZone(pickup(tm),zone);
+  document.getElementById('tmr-title').textContent='Ritiro di '+fmt(tm,{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('tmr-chips').innerHTML=chips(L);
+  document.getElementById('tmr-sub').textContent=L.length?'Fuori dalle 22:00 di stasera, entro le 5:00 di domani.':'Domani non passano: stasera niente da esporre.';
+  document.getElementById('today-chips').innerHTML=chips(forZone(pickup(t),zone),true);
+  let h='';
+  for(let i=2;i<=8;i++){const d=addDays(t,i);const l=forZone(pickup(d),zone);
+    h+=`<div class="card day${d.getDay()===0?' sun':''}"><div class="d"><b>${d.getDate()}</b><span>${fmt(d,{weekday:'short'}).replace('.','')}</span></div><div class="chips">${chips(l,true)}</div></div>`;}
+  document.getElementById('days').innerHTML=h;
+  let n='';
+  for(const k in T){ let d=t, found=null;
+    for(let i=0;i<60&&!found;i++){ d=addDays(t,i); const l=forZone(pickup(d),zone); if(l.some(x=>x.t===k)) found=d; }
+    n+=`<div class="card nx"><i style="background:${T[k].c}">${T[k].e}</i><div><b>${T[k].n}</b><span>${found?dayName(found)+(dayName(found).length>6?', '+fmt(found,{day:'numeric',month:'short'}).replace('.',''):''):'—'}</span></div></div>`; }
+  document.getElementById('next').innerHTML=n;
+}
+
+/* ===== Vista CALENDARIO ===== */
+let cur=new Date(today().getFullYear(),today().getMonth(),1), sel=today();
+function renderCal(){
+  document.getElementById('cal-title').textContent=fmt(cur,{month:'long',year:'numeric'});
+  const first=(cur.getDay()+6)%7, days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate(), t=today();
+  let h=''; for(let i=0;i<first;i++) h+='<div class="cell empty"></div>';
+  for(let d=1;d<=days;d++){ const dt=new Date(cur.getFullYear(),cur.getMonth(),d); const l=forZone(pickup(dt),zone); const sz=l.find(x=>x.zone);
+    h+=`<div class="cell${dt.getDay()===0?' sun':''}${sameDay(dt,t)?' now':''}${sameDay(dt,sel)?' sel':''}" data-d="${key(dt)}"><span class="n">${d}</span>${sz?`<span class="z">${sz.zone[0]}</span>`:''}<div class="dots">${l.map(x=>`<i style="background:${T[x.t].c}"></i>`).join('')}</div></div>`; }
+  document.getElementById('cal').innerHTML=h;
+  document.getElementById('legend').innerHTML=Object.values(T).map(t=>`<span><i style="background:${t.c}"></i>${t.n}</span>`).join('');
+  renderDetail();
+}
+function renderDetail(){
+  const l=forZone(pickup(sel),zone), all=pickup(sel), exc=!!EXC[key(sel)];
+  document.getElementById('detail').innerHTML=`<div class="t">${dayName(sel)} · ${fmt(sel,{day:'numeric',month:'long'})}</div><div class="chips">${chips(l,true)}</div>${exc?'<div class="note">⚠️ Variazione per festività.</div>':''}${!zone&&all.some(x=>x.zone)?'<div class="note">Il secco è ritirato solo nella zona indicata: scegli Nord o Sud in alto.</div>':''}`;
+}
+document.getElementById('cal').addEventListener('click',e=>{const c=e.target.closest('.cell[data-d]');if(!c)return;const [y,m,d]=c.dataset.d.split('-').map(Number);sel=new Date(y,m-1,d);renderCal();});
+document.getElementById('prev').onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);renderCal();};
+document.getElementById('nxt').onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);renderCal();};
+
+/* ===== Zona ===== */
+function renderZone(){ document.querySelectorAll('#zone button').forEach(b=>b.classList.toggle('on',b.dataset.z===zone)); }
+document.getElementById('zone').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;zone=(zone===b.dataset.z)?'':b.dataset.z;localStorage.setItem('rifiuti_zone',zone);renderAll();});
+
+/* ===== Tabs ===== */
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v)); window.scrollTo(0,0);});
+
+/* ===== Centro di raccolta: aperto ora? ===== */
+function renderCdr(){
+  const d=new Date(), m=d.getMonth()+1, summer=m>=4&&m<=10, w=d.getDay();
+  const pm=summer?'15:00–18:00':'14:00–17:00';
+  const slots={1:[pm],2:['9:00–12:00'],3:[pm],4:['9:00–12:00'],5:[pm],6:['9:00–12:00',pm],0:[]}[w];
+  document.getElementById('cdr-now').textContent='Oggi ('+fmt(d,{weekday:'long'})+'): '+(slots.length?slots.join(' e '):'chiuso')+(summer?' · orario estivo':' · orario invernale');
+}
+
+/* ===== Export ICS ===== */
+document.getElementById('ics').onclick=()=>{
+  const z=zone||'NORD'; const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Rifiuti Mazzano//IT','X-WR-CALNAME:Rifiuti Mazzano ('+z+')'];
+  const y=today().getFullYear(); const start=new Date(y,0,1), end=new Date(y,11,31);
+  for(let d=start; d<=end; d=addDays(d,1)){ const l=forZone(pickup(d),z); if(!l.length) continue;
+    const ds=key(d).replace(/-/g,''), de=key(addDays(d,1)).replace(/-/g,'');
+    const names=l.map(x=>T[x.t].n).join(', ');
+    lines.push('BEGIN:VEVENT','UID:rifiuti-'+ds+'-'+z+'@mazzano','DTSTAMP:'+ds+'T000000Z','DTSTART;VALUE=DATE:'+ds,'DTEND;VALUE=DATE:'+de,
+      'SUMMARY:♻️ '+names,'DESCRIPTION:Esponi dalle 22:00 della sera prima. Zona secco: '+z,
+      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Stasera esponi: '+names,'TRIGGER:-PT4H','END:VALARM','END:VEVENT'); }
+  lines.push('END:VCALENDAR');
+  const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='rifiuti-mazzano-'+y+'-'+z.toLowerCase()+'.ics'; document.body.appendChild(a); a.click(); a.remove();
+};
+
+function renderAll(){ renderZone(); renderOggi(); renderCal(); renderCdr(); }
+renderAll();
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) renderAll(); });
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script>
+</body>
+</html>
