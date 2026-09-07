@@ -1,23 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#2f7d5b"/>
-  <circle cx="400" cy="90" r="160" fill="#3f9a6e"/>
-  <circle cx="70" cy="450" r="130" fill="#256a4c"/>
-  <!-- ombra -->
-  <ellipse cx="256" cy="440" rx="118" ry="14" fill="#1a4a35" opacity=".55"/>
-  <!-- corpo bidone -->
-  <path d="M150 196 h212 l-16 216 a26 26 0 0 1 -26 24 H192 a26 26 0 0 1 -26 -24 z" fill="#f6f3ec"/>
-  <!-- scanalature -->
-  <g stroke="#2f7d5b" stroke-width="12" stroke-linecap="round" opacity=".5">
-    <line x1="212" y1="236" x2="220" y2="392"/>
-    <line x1="256" y1="236" x2="256" y2="392"/>
-    <line x1="300" y1="236" x2="292" y2="392"/>
+  <rect width="512" height="512" fill="#f4f1ea"/>
+  <ellipse cx="256" cy="420" rx="200" ry="14" fill="#d9d3c4"/>
+  <g>
+    <path d="M70 200 h112 l-10 190 a18 18 0 0 1 -18 18 H98 a18 18 0 0 1 -18 -18 z" fill="#c93d2e"/>
+    <rect x="58" y="176" width="136" height="30" rx="15" fill="#a83022"/>
+    <path d="M200 160 h112 l-10 230 a18 18 0 0 1 -18 18 H228 a18 18 0 0 1 -18 -18 z" fill="#e8b90c"/>
+    <rect x="188" y="136" width="136" height="30" rx="15" fill="#c79c07"/>
+    <path d="M330 200 h112 l-10 190 a18 18 0 0 1 -18 18 H358 a18 18 0 0 1 -18 -18 z" fill="#2f7d5b"/>
+    <rect x="318" y="176" width="136" height="30" rx="15" fill="#256a4c"/>
   </g>
-  <!-- coperchio -->
-  <rect x="126" y="160" width="260" height="40" rx="20" fill="#ffffff"/>
-  <rect x="216" y="128" width="80" height="44" rx="18" fill="#ffffff"/>
-  <!-- foglia -->
-  <g transform="translate(330 110) rotate(-20)">
-    <path d="M0 0 C 60 -70, 130 -60, 140 -40 C 120 20, 50 50, 0 0 z" fill="#b9e872"/>
-    <path d="M6 -4 C 50 -20, 95 -35, 128 -40" stroke="#5f9b2e" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <g fill="#ffffff" opacity=".35">
+    <rect x="96" y="230" width="14" height="140" rx="7"/>
+    <rect x="226" y="190" width="14" height="180" rx="7"/>
+    <rect x="356" y="230" width="14" height="140" rx="7"/>
   </g>
 </svg>
