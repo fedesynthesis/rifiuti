@@ -205,6 +205,15 @@ ul{padding-left:18px;margin:0}li{margin:4px 0;font-size:15px}
        <a href="https://www.cbbo.it/sites/default/files/2026-03/guida%20raccolta%20differenziata_MAZZANO_REV_MARZO%202026.pdf" target="_blank" rel="noopener">📄 Guida alla differenziata (PDF)</a></p>
   </div>
 
+  <div class="card" id="push-card">
+    <h3>Notifica la sera prima</h3>
+    <p>Ogni sera alle <b>21:00</b> ti avviso cosa esporre per il ritiro del giorno dopo, nella tua zona.</p>
+    <p class="note" id="push-status">Controllo…</p>
+    <button class="btn" id="push-on">Attiva le notifiche</button>
+    <button class="btn" id="push-test" style="background:#e9e4d8;color:var(--ink)">Invia una notifica di prova</button>
+    <p class="note">Su iPhone funziona solo con l'app aggiunta alla schermata Home. La prova arriva entro un paio di minuti.</p>
+  </div>
+
   <div class="card">
     <h3>Promemoria sul telefono</h3>
     <p>Scarica un file per il Calendario iPhone: un evento per ogni ritiro della tua zona, con avviso la sera prima alle 20:00.</p>
@@ -306,7 +315,7 @@ document.getElementById('nxt').onclick=()=>{cur=new Date(cur.getFullYear(),cur.g
 
 /* ===== Zona ===== */
 function renderZone(){ document.querySelectorAll('#zone button').forEach(b=>b.classList.toggle('on',b.dataset.z===zone)); }
-document.getElementById('zone').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;zone=(zone===b.dataset.z)?'':b.dataset.z;localStorage.setItem('rifiuti_zone',zone);renderAll();});
+document.getElementById('zone').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;zone=(zone===b.dataset.z)?'':b.dataset.z;localStorage.setItem('rifiuti_zone',zone);renderAll();document.dispatchEvent(new Event('zone-changed'));});
 
 /* ===== Tabs ===== */
 document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
@@ -340,6 +349,70 @@ function renderAll(){ renderZone(); renderOggi(); renderCal(); renderCdr(); }
 renderAll();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) renderAll(); });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script>
+
+<!-- ============ Notifiche push: token FCM salvato su Firebase (progetto tempo-1580f), invio dallo scheduler di TEMPO ============ -->
+<script type="module">
+const firebaseConfig = {
+  apiKey:            "AIzaSyCGPx6HkTAHVHG0D5UaTTNVZsDWYj6DWi4",
+  authDomain:        "tempo-1580f.firebaseapp.com",
+  projectId:         "tempo-1580f",
+  storageBucket:     "tempo-1580f.firebasestorage.app",
+  messagingSenderId: "184502030968",
+  appId:             "1:184502030968:web:56d7e9d3a08e85181e138d"
+};
+const VAPID_KEY = "BLMnmXBDgFt8Xok8ddgmG_eA6ZM3_bvmWpFl3_464k9Quu6KQ8HjSxag2xufbl5_iUohhsOMbG7F7boM7ws-TTc";
+const COL = 'tempo_rifiuti_tokens';
+const $ = id=>document.getElementById(id);
+const status = (t)=>{ $('push-status').textContent=t; };
+let messaging=null, db=null, setDocFn=null, docFn=null, curToken=null;
+
+const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+
+async function saveToken(extra={}){
+  if(!curToken) return;
+  await setDocFn(docFn(db,COL,curToken), { token:curToken, zone: zone||'NORD', ua:navigator.userAgent.slice(0,180), updatedAt:Date.now(), ...extra }, { merge:true });
+}
+async function registerPush(interactive){
+  if(!supported||!messaging){ status(standalone?'Notifiche non disponibili su questo dispositivo.':'Aggiungi prima l\'app alla schermata Home, poi tocca "Attiva".'); return {ok:false}; }
+  let perm=Notification.permission;
+  if(perm==='default'){ if(!interactive){ status('Tocca "Attiva le notifiche" per ricevere l\'avviso delle 21.'); return {ok:false}; } perm=await Notification.requestPermission(); }
+  if(perm!=='granted'){ status('Notifiche bloccate: abilitale in Impostazioni → Notifiche → Rifiuti.'); return {ok:false}; }
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const { getToken } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js');
+    const token=await getToken(messaging,{ vapidKey:VAPID_KEY, serviceWorkerRegistration:reg });
+    if(!token){ status('Token non ottenuto: riprova.'); return {ok:false}; }
+    curToken=token; await saveToken();
+    status('Notifiche attive ✓ · zona '+(zone||'NORD')+' · ogni sera alle 21.');
+    $('push-on').hidden=true; $('push-test').hidden=false;
+    return {ok:true};
+  }catch(e){ console.warn('push',e); status('Errore attivazione: '+(e.message||e)); return {ok:false}; }
+}
+
+try{
+  const V='10.12.2';
+  const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+  const { getFirestore, doc, setDoc } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
+  const { getMessaging, isSupported } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-messaging.js`);
+  const app=initializeApp(firebaseConfig); db=getFirestore(app); setDocFn=setDoc; docFn=doc;
+  if(supported && await isSupported()) messaging=getMessaging(app);
+}catch(e){ console.warn('Firebase non inizializzato:', e); }
+
+$('push-test').hidden=true;
+$('push-on').onclick=()=>registerPush(true);
+$('push-test').onclick=async()=>{ if(!curToken){ const r=await registerPush(true); if(!r.ok) return; } try{ await saveToken({ testAt:Date.now() }); status('Prova richiesta: arriva entro un paio di minuti (anche a schermo spento).'); }catch(e){ status('Errore: '+(e.message||e)); } };
+document.addEventListener('zone-changed',()=>{ if(curToken) saveToken().then(()=>status('Notifiche attive ✓ · zona '+(zone||'NORD')+' · ogni sera alle 21.')).catch(()=>{}); });
+
+// permesso implicito: al primo tocco nell'app (iOS vuole un gesto), poi refresh silenzioso a ogni apertura
+if(supported && messaging && Notification.permission==='default'){
+  const once=()=>{ document.removeEventListener('pointerdown',once); registerPush(true); };
+  document.addEventListener('pointerdown',once);
+}
+const silent=()=>{ if(messaging && Notification.permission==='granted') registerPush(false); else registerPush(false); };
+silent();
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && messaging && Notification.permission==='granted') registerPush(false); });
 </script>
 </body>
 </html>
