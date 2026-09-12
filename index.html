@@ -207,7 +207,7 @@ ul{padding-left:18px;margin:0}li{margin:4px 0;font-size:15px}
 
   <div class="card" id="push-card">
     <h3>Notifica la sera prima</h3>
-    <p>Ogni sera alle <b>21:00</b> ti avviso cosa esporre per il ritiro del giorno dopo, nella tua zona.</p>
+    <p>Ogni sera alle <b>20:30</b> ti avviso cosa esporre per il ritiro del giorno dopo, nella tua zona.</p>
     <p class="note" id="push-status">Controllo…</p>
     <button class="btn" id="push-on">Attiva le notifiche</button>
     <button class="btn" id="push-test" style="background:#e9e4d8;color:var(--ink)">Invia una notifica di prova</button>
@@ -377,7 +377,7 @@ async function saveToken(extra={}){
 async function registerPush(interactive){
   if(!supported||!messaging){ status(standalone?'Notifiche non disponibili su questo dispositivo.':'Aggiungi prima l\'app alla schermata Home, poi tocca "Attiva".'); return {ok:false}; }
   let perm=Notification.permission;
-  if(perm==='default'){ if(!interactive){ status('Tocca "Attiva le notifiche" per ricevere l\'avviso delle 21.'); return {ok:false}; } perm=await Notification.requestPermission(); }
+  if(perm==='default'){ if(!interactive){ status('Tocca "Attiva le notifiche" per ricevere l\'avviso delle 20:30.'); return {ok:false}; } perm=await Notification.requestPermission(); }
   if(perm!=='granted'){ status('Notifiche bloccate: abilitale in Impostazioni → Notifiche → Rifiuti.'); return {ok:false}; }
   try{
     const reg=await navigator.serviceWorker.ready;
@@ -385,7 +385,7 @@ async function registerPush(interactive){
     const token=await getToken(messaging,{ vapidKey:VAPID_KEY, serviceWorkerRegistration:reg });
     if(!token){ status('Token non ottenuto: riprova.'); return {ok:false}; }
     curToken=token; await saveToken();
-    status('Notifiche attive ✓ · zona '+(zone||'NORD')+' · ogni sera alle 21.');
+    status('Notifiche attive ✓ · zona '+(zone||'NORD')+' · ogni sera alle 20:30.');
     $('push-on').hidden=true; $('push-test').hidden=false;
     return {ok:true};
   }catch(e){ console.warn('push',e); status('Errore attivazione: '+(e.message||e)); return {ok:false}; }
@@ -403,7 +403,7 @@ try{
 $('push-test').hidden=true;
 $('push-on').onclick=()=>registerPush(true);
 $('push-test').onclick=async()=>{ if(!curToken){ const r=await registerPush(true); if(!r.ok) return; } try{ await saveToken({ testAt:Date.now() }); status('Prova richiesta: arriva entro un paio di minuti (anche a schermo spento).'); }catch(e){ status('Errore: '+(e.message||e)); } };
-document.addEventListener('zone-changed',()=>{ if(curToken) saveToken().then(()=>status('Notifiche attive ✓ · zona '+(zone||'NORD')+' · ogni sera alle 21.')).catch(()=>{}); });
+document.addEventListener('zone-changed',()=>{ if(curToken) saveToken().then(()=>status('Notifiche attive ✓ · zona '+(zone||'NORD')+' · ogni sera alle 20:30.')).catch(()=>{}); });
 
 // permesso implicito: al primo tocco nell'app (iOS vuole un gesto), poi refresh silenzioso a ogni apertura
 if(supported && messaging && Notification.permission==='default'){
