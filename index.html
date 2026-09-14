@@ -215,9 +215,11 @@ ul{padding-left:18px;margin:0}li{margin:4px 0;font-size:15px}
   </div>
 
   <div class="card">
-    <h3>Promemoria sul telefono</h3>
-    <p>Scarica un file per il Calendario iPhone: un evento per ogni ritiro della tua zona, con avviso la sera prima alle 20:00.</p>
-    <button class="btn" id="ics">Esporta il 2026 in Calendario (.ics)</button>
+    <h3>Promemoria sempre attivo (consigliato)</h3>
+    <p>Aggiungi il calendario dei rifiuti al Calendario di iPhone: l'avviso lo dà il telefono <b>in locale ogni sera alle 20:30</b>, anche offline e anche con l'app chiusa — non serve nient'altro.</p>
+    <button class="btn" id="ics-sub">📅 Aggiungi al calendario iPhone</button>
+    <p class="note">Quando iPhone lo chiede, <b>lascia attivi gli avvisi</b> (non premere "Rimuovi avvisi"). Si aggiorna da solo. Zona secco: <b id="ics-zone">NORD</b>.</p>
+    <p class="note" style="margin-top:10px">In alternativa puoi scaricare il file una tantum (non si aggiorna da solo): <button class="btn" id="ics" style="background:#e9e4d8;color:var(--ink);padding:6px 12px;font-size:.85em">Scarica .ics</button></p>
   </div>
 </section>
 
@@ -343,6 +345,19 @@ document.getElementById('ics').onclick=()=>{
   lines.push('END:VCALENDAR');
   const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'}); const a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download='rifiuti-mazzano-'+y+'-'+z.toLowerCase()+'.ics'; document.body.appendChild(a); a.click(); a.remove();
+};
+
+/* Sottoscrizione calendario (sempre attivo): apre webcal:// per la zona scelta.
+   iPhone chiede di aggiungerlo e da lì suona in locale ogni sera alle 20:30. */
+const SUB_HOST='fedesynthesis.github.io/rifiuti';
+const icsZoneLbl=document.getElementById('ics-zone');
+function syncIcsZone(){ if(icsZoneLbl) icsZoneLbl.textContent=zone||'— scegli zona'; }
+syncIcsZone();
+document.addEventListener('zone-changed', syncIcsZone);
+const subBtn=document.getElementById('ics-sub');
+if(subBtn) subBtn.onclick=()=>{
+  if(!zone){ alert('Scegli prima la tua zona (Nord o Sud) qui sopra: il ritiro del secco cambia tra le due.'); return; }
+  location.href='webcal://'+SUB_HOST+'/rifiuti-'+zone.toLowerCase()+'.ics';
 };
 
 function renderAll(){ renderZone(); renderOggi(); renderCal(); renderCdr(); }
